@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
     private DirectionInput directionInput;
     private Coroutine coroutineSlide;
     private CharacterController characterController;
+    private PlayerAnimation playerAnimation;
     private float verticalPos;
     private int actualLane;
     private Vector3 desiredLane;
@@ -43,6 +44,7 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         characterController = GetComponent<CharacterController>();
+        playerAnimation = GetComponent<PlayerAnimation>();
     }
     // Start is called before the first frame update
     void Start()
@@ -73,14 +75,22 @@ public class PlayerController : MonoBehaviour
     {
         if(characterController.isGrounded)
         {
+            Debug.Log("isGrounded");
             isJumping = false;
             verticalPos = 0f;
+
+            //Acá le indico que si no estoy saltando y no me estoy deslizando muestre la animación de correr
+            if (!isSliding && !isJumping)
+            {
+                playerAnimation.showAnimationRun();
+            }
 
             //Si detecto que cambia la dirección del input a Up cambio el valor por el de jumpForce
             if (directionInput == DirectionInput.Up)
             {
                 verticalPos = jumpForce;
                 isJumping = true;
+                playerAnimation.showAnimationJump();
                 //reestablezco el collider para el salto 
                 if (coroutineSlide != null)
                 {
@@ -189,6 +199,7 @@ public class PlayerController : MonoBehaviour
     private IEnumerator COSlidePlayer()
     {
         isSliding = true;
+        playerAnimation.showAnimationSlide();
         ModifyCollider(true);
         yield return new WaitForSeconds(2f);
         ModifyCollider(false);
